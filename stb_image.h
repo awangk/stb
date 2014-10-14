@@ -1577,6 +1577,7 @@ static int stbi__process_frame_header(stbi__jpeg *z, int scan)
    s->img_n = c;
    for (i=0; i < c; ++i) {
       z->img_comp[i].data = NULL;
+      z->img_comp[i].raw_data = NULL;
       z->img_comp[i].linebuf = NULL;
    }
 
@@ -1621,13 +1622,8 @@ static int stbi__process_frame_header(stbi__jpeg *z, int scan)
       z->img_comp[i].w2 = z->img_mcu_x * z->img_comp[i].h * 8;
       z->img_comp[i].h2 = z->img_mcu_y * z->img_comp[i].v * 8;
       z->img_comp[i].raw_data = stbi__malloc(z->img_comp[i].w2 * z->img_comp[i].h2+15);
-      if (z->img_comp[i].raw_data == NULL) {
-         for(--i; i >= 0; --i) {
-            free(z->img_comp[i].raw_data);
-            z->img_comp[i].data = NULL;
-         }
-         return stbi__err("outofmem", "Out of memory");
-      }
+      if (z->img_comp[i].raw_data == NULL)
+          return stbi__err("outofmem", "Out of memory");
       // align blocks for installable-idct using mmx/sse
       z->img_comp[i].data = (stbi_uc*) (((size_t) z->img_comp[i].raw_data + 15) & ~15);
       z->img_comp[i].linebuf = NULL;
